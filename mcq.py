@@ -1,6 +1,7 @@
 from easy_question import easy_question
 from medium_question import medium_question
 from hard_question import hard_question
+import csv
 
 easy_question_prompt = [
     "1. Which among the following best describes encapsulation? \n a) It is a way of combining various data members "
@@ -65,7 +66,7 @@ questions3 = [hard_question(hard_question_prompt[0], "d"),
 
 def run_test(quest1, quest2, quest3):
     score = 0
-    flag =[]
+    flag = []
     incorrect = 0
 
     for easy_question in quest1:
@@ -79,8 +80,8 @@ def run_test(quest1, quest2, quest3):
                 break
         else:
             incorrect += 1
-            flag=easy_question.prompt
-            print("you got this question incorrect\n"+ str(flag))
+            flag = easy_question.prompt
+            print("you got this question incorrect\n" + str(flag))
     for medium_question in quest2:
 
         ans = input(medium_question.prompt)
@@ -104,9 +105,14 @@ def run_test(quest1, quest2, quest3):
             flag = hard_question.prompt
             print("you got this question incorrect\n" + str(flag))
 
-
     print("your score is: " + str(score))
     print("number of incorrect questions is: " + str(incorrect))
+    with open('sampleDB.csv', 'a') as sample_db:
+        fieldnames = ["Viva", ""]
+        writer = csv.DictWriter(sample_db, fieldnames=fieldnames)
+        writer.writerow({"Viva": str(score)})
 
 
 run_test(questions1, questions2, questions3)
+
+
