@@ -1,7 +1,16 @@
 from easy_question import easy_question
 from medium_question import medium_question
 from hard_question import hard_question
-from begin import name, roll, select
+import csv
+from doctemp import doc
+from exec import exec
+from gtts import gTTS
+#from speechrec_trial import oviva
+
+# This module is imported so that we can
+# play the converted audio
+import os
+
 
 easy_question_prompt = [
     "1. Which among the following best describes encapsulation? \n a) It is a way of combining various data members "
@@ -29,6 +38,7 @@ medium_question_prompt = [
     "a) Have access to all the members of a class\n"
     "b) Have access to only constant members of a class\n"
     "c) Have access to only the static members of a class\nd) Have direct access to all members of cricket\n",
+
 ]
 
 hard_question_prompt = [
@@ -59,52 +69,76 @@ questions3 = [hard_question(hard_question_prompt[0], "d"),
               hard_question(hard_question_prompt[1], "b"),
               hard_question(hard_question_prompt[2], "b"),
               hard_question(hard_question_prompt[3], "b"),
+
               ]
-score = 0
-if select == '1':
-    print("welcome " + str(name))
-    print("of roll" + str(roll))
 
-    def run_test(score,quest1, quest2, quest3):
-        incorrect = 0
 
-        for easy_question in quest1:
+def run_test(quest1, quest2, quest3):
+    roll = input("enter roll")
+    name = input("enter name")
+    score = 0
+    flag = []
+    incorrect = 0
 
-            ans = input(easy_question.prompt)
+    for easy_question in quest1:
+        text = easy_question.prompt
+        #language = 'en'
+        #myobj = gTTS(text=text, lang=language, slow=False)
+        #myobj.save("easy.mp3")
+        #os.system("easy.mp3")
+        ans = input(easy_question.prompt)
 
-            if ans == easy_question.answer:
-                score += 1
+        if ans == easy_question.answer:
+            score += 1
 
-                if score >= 2:
-                    break
-            else:
-                incorrect += 1
-                flag = easy_question.prompt
-                print("you got this question incorrect\n" + str(flag))
-        for medium_question in quest2:
+            if score >= 2:
+                break
+        else:
+            incorrect += 1
+            print("you got this question incorrect\n" )
+    for medium_question in quest2:
+        text = medium_question.prompt
+        #language = 'en'
+        #myobj = gTTS(text=text, lang=language, slow=False)
+        #myobj.save("medium.mp3")
+        #os.system("medium.mp3")
+        ans = input(medium_question.prompt)
 
-            ans = input(medium_question.prompt)
+        if ans == medium_question.answer:
+            score += 1
+            if score >= 4:
+                break
+        else:
+            incorrect += 1
+            print("you got this question incorrect\n")
+    for hard_question in quest3:
+        text = hard_question.prompt
+        #language = 'en'
+        #myobj = gTTS(text=text, lang=language, slow=False)
+        #myobj.save("hard.mp3")
+        #os.system("hard.mp3")
+        ans = input(hard_question.prompt)
 
-            if ans == medium_question.answer:
-                score += 1
-                if score >= 4:
-                    break
-            else:
-                incorrect += 1
-                flag = medium_question.prompt
-                print("you got this question incorrect\n" + str(flag))
-        for hard_question in quest3:
+        if ans == hard_question.answer:
+            score += 1
+        else:
+            incorrect += 1
+            print("you got this question incorrect\n" )
 
-            ans = input(hard_question.prompt)
+    print("your score is: " + str(score))
+    print("number of incorrect questions is: " + str(incorrect))
+    total = score + exec + doc
+    with open('sampleDB2.csv', 'a') as sample_db2:
+        fieldnames = ["Roll", "Name", "Viva", "Documentation", "Execution", "Total"]
+        writer = csv.DictWriter(sample_db2, fieldnames=fieldnames)
+        writer.writerow({"Roll": str(roll), "Name": str(name), "Viva": str(score), "Documentation": str(doc),
+                         "Execution": str(exec), "Total": str(total)})
 
-            if ans == hard_question.answer:
-                score += 1
-            else:
-                incorrect += 1
-                flag = hard_question.prompt
-                print("you got this question incorrect\n" + str(flag))
+    with open('sampleDB3.csv', 'a') as sample_db3:
+        fieldnames = ["Viva", "Documentation", "Execution"]
+        writer = csv.DictWriter(sample_db3, fieldnames=fieldnames)
+        writer.writerow({"Viva": float(score), "Documentation": float(doc),
+                         "Execution": float(exec)})
 
-        print("your score is: " + str(score))
-        print("number of incorrect questions is: " + str(incorrect))
 
-        return score
+run_test(questions1, questions2, questions3)

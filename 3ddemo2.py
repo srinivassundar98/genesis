@@ -1,20 +1,34 @@
-
+import csv
 import numpy as np
 import matplotlib.pyplot as plt
 # Though the following import is not directly being used, it is required
 # for 3D projection to work
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import style
+
 style.use('ggplot')
 from sklearn.cluster import KMeans
 from sklearn import datasets
 
+filename = 'sampleDB3.csv'
+raw_data = open(filename, 'rt')
+data1 = np.loadtxt(raw_data, delimiter=",")
+print(data1.shape)
 
-iris = datasets.load_iris()
-X = iris.data
-y = iris.target
+viva_mark = data1[:,]
+doc_mark = data1[:,1]
+exec_mark = data1[:,2]
+print(viva_mark[:,])
+print(doc_mark[:,])
+print(exec_mark[:,])
 
-estimators = [('k_means_iris_8', KMeans(n_clusters=6))
+
+X = viva_mark
+y = doc_mark
+print(X)
+print(y)
+
+estimators = [('k_means_iris_8', KMeans(n_clusters=2))
               ]
 
 fignum = 1

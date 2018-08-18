@@ -1,25 +1,85 @@
-import matplotlib.pyplot as plt
-from matplotlib import style
-
-style.use('ggplot')
 import numpy as np
-from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.animation as animation
 
-X = np.array([[1, 2, 3],
-              [4, 5, 5],
-              [8, 8, 8],
-              [6, 6, 1],
-              [9, 11, 7],
-              [5, 8, 9]])
-clf = KMeans(n_clusters=2)
-clf.fit(X)
 
-centroids = clf.cluster_centers_
-labels = clf.labels_
+def load_dataset(name):
+    return np.loadtxt(name, delimiter=",")
 
-colors = ["g.", "r.", "c."]
 
-for i in range(len(X)):
-    plt.plot(X[i][0], X[i][1], colors[labels[i]], markersize=10)
-plt.scatter(centroids[:, 0], centroids[:, 1], marker='x', s=150, linewidths=5)
-plt.show()
+def euclidian(a, b):
+    return np.linalg.norm(a - b)
+
+
+def plot(dataset, history_centroids, belongs_to):
+    colors = ['r', 'g']
+
+    fig, ax = plt.subplots()
+
+    for index in range(dataset.shape[0]):
+        instances_close = [i for i in range(len(belongs_to)) if belongs_to[i] == index]
+        for instance_index in instances_close:
+            ax.plot(dataset[instance_index][0], dataset[instance_index][1], dataset[instance_index][2], (colors[index] + 'o'))
+
+    history_points = []
+    for index, centroids in enumerate(history_centroids):
+        for inner, item in enumerate(centroids):
+            if index == 0:
+                history_points.append(ax.plot(item[0], item[1], item[2], 'bo')[0])
+            else:
+                history_points[inner].set_data(item[0], item[1],item[2])
+                print("centroids {} {}".format(index, item))
+
+                plt.pause(0.8)
+
+
+def kmeans(k, epsilon=0, distance='euclidian'):
+    history_centroids = []
+    if distance == 'euclidian':
+        dist_method = euclidian
+    dataset = load_dataset('sampleDB3.csv')
+    # dataset = dataset[:, 0:dataset.shape[1] - 1]
+    num_instances, num_features = dataset.shape
+    prototypes = dataset[np.random.randint(0, num_instances - 1, size=k)]
+    history_centroids.append(prototypes)
+    prototypes_old = np.zeros(prototypes.shape)
+    belongs_to = np.zeros((num_instances, 1))
+    norm = dist_method(prototypes, prototypes_old,)
+    iteration = 0
+    while norm > epsilon:
+        iteration += 1
+        norm = dist_method(prototypes, prototypes_old)
+        prototypes_old = prototypes
+        for index_instance, instance in enumerate(dataset):
+            dist_vec = np.zeros((k, 1))
+            for index_prototype, prototype in enumerate(prototypes):
+                dist_vec[index_prototype] = dist_method(prototype,
+                                                        instance)
+
+            belongs_to[index_instance, 0] = np.argmin(dist_vec)
+
+        tmp_prototypes = np.zeros((k, num_features))
+
+        for index in range(len(prototypes)):
+            instances_close = [i for i in range(len(belongs_to)) if belongs_to[i] == index]
+            prototype = np.mean(dataset[instances_close], axis=0)
+            # prototype = dataset[np.random.randint(0, num_instances, size=1)[0]]
+            tmp_prototypes[index, :] = prototype
+
+        prototypes = tmp_prototypes
+
+        history_centroids.append(tmp_prototypes)
+
+    # plot(dataset, history_centroids, belongs_to)
+
+    return prototypes, history_centroids, belongs_to
+
+
+def execute():
+    dataset = load_dataset('sampleDB3.csv')
+    centroids, history_centroids, belongs_to = kmeans(2)
+    plot(dataset, history_centroids, belongs_to)
+
+
+execute()
